@@ -10,16 +10,7 @@ const Navbar = () => {
   return (
     <header className="w-full bg-white border-b border-gray-100 shadow-sm">
       <div className="container mx-auto flex items-center justify-between px-6 relative h-20">
-       
-        <Link to="/" className="z-10 flex items-center">
-          <img
-            src="/no-fluff.jpeg"
-            alt="App Icon"
-            className="w-40 h-40 object-contain scale-70"
-            draggable={false}
-          />
-        </Link>
-
+     
         
         <nav className="hidden md:flex space-x-8 absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <Link to="/" className={isActive("/")}>

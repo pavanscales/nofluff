@@ -1,262 +1,152 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
-import Navbar from "@/components/Navbar";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 
-const allTags = [
-  "Technology", "Software Development", "Digital Privacy", "Cybersecurity", "AI & Automation", "Mobile Apps",
-  "Digital Accessibility", "Web Development", "Cloud Computing", "Environment", "Climate Action",
-  "Renewable Energy", "Waste Management", "Sustainable Living", "Conservation", "Urban Planning", "Healthcare",
-  "Mental Health", "Fitness & Exercise", "Nutrition", "Elder Care", "Telehealth", "Health Tech", "Education",
-  "Online Learning", "Professional Development", "STEM Education", "Coding Bootcamps", "Technical Documentation",
-  "Learning Resources", "Community Building", "Online Communities", "Open Source Projects", "Volunteer Management",
-  "Tech Conferences", "Public Safety", "Civic Tech", "Remote Work", "Workplace Tools", "Small Business",
-  "Entrepreneurship", "Job Search", "Career Development", "Work-Life Balance", "Freelancing", "Housing",
-  "Transportation", "Public Transit", "Digital Infrastructure", "Smart Cities", "Rural Connectivity",
-  "Internet Access", "Personal Productivity", "Personal Finance", "Time Management", "Smart Home", "Tech Support",
-  "Home Office", "Consumer Tech", "Communication", "Social Media", "Digital Literacy", "Content Creation",
-  "Podcasting", "Media Production", "Information Access", "Personal Branding", "Digital Marketing", "E-commerce",
-  "Online Privacy", "Identity Management", "Subscription Services", "Digital Wellness", "Arts & Technology",
-  "Gaming & Esports", "Travel Tech", "Emergency Tech", "Legal Tech", "Research & Innovation", "Open Source"
-];
-
-// Reusable Step Indicator component
-const StepIndicator = ({
-  step,
-  currentStep,
-  label,
-}: {
-  step: number;
-  currentStep: number;
-  label: string;
-}) => (
-  <div className="flex items-center w-full min-w-[80px]">
-    <div className="flex flex-col items-center">
-      <div
-        className={cn(
-          "w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold",
-          currentStep >= step ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-600"
-        )}
-      >
-        {step}
-      </div>
-      <span className="text-xs mt-1 text-center max-w-[70px] truncate">{label}</span>
-    </div>
-    {step !== 3 && <div className="flex-1 h-px bg-gray-300 mx-2"></div>}
-  </div>
-);
+import React, { useState } from "react";
 
 const Submit = () => {
   const [step, setStep] = useState(1);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [searchTag, setSearchTag] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [context, setContext] = useState("");
   const [impact, setImpact] = useState("");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  // Filter tags based on search & selection
-  const filteredTags = allTags.filter(
-    (tag) =>
-      !selectedTags.includes(tag) &&
-      (searchTag === "" || tag.toLowerCase().includes(searchTag.toLowerCase()))
-  );
+  const isStep1Valid = title.length >= 5 && description.length >= 10;
+  const isStep2Valid = context.length >= 10 && impact.length >= 10;
+  const isStep3Valid = selectedTags.length > 0;
 
-  // Use functional state update for arrays
-  const handleTagSelect = useCallback(
-    (tag: string) => {
-      if (selectedTags.length >= 5) return;
-      setSelectedTags((prev) => [...prev, tag]);
-      setSearchTag("");
+  const { mutate: submitProblem, isLoading, isSuccess } = api.submit.submitProblem.useMutation({
+    onSuccess: () => {
+      alert("Problem submitted successfully!");
+      setStep(1);
+      setTitle("");
+      setDescription("");
+      setContext("");
+      setImpact("");
+      setSelectedTags([]);
     },
-    [selectedTags.length]
-  );
-
-  const handleTagRemove = useCallback((tag: string) => {
-    setSelectedTags((prev) => prev.filter((t) => t !== tag));
-  }, []);
-
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [step]);
-
-  const isStep1Valid = title.length >= 5 && selectedTags.length > 0;
-  const isStep2Valid = context.length > 10 && impact.length > 10;
+    onError: (err) => {
+      alert("Error: " + err.message);
+    },
+  });
 
   const handleContinue = () => {
-    if (step < 3) setStep((s) => s + 1);
-    else alert("Submitted!");
+    if (step === 1 && isStep1Valid) return setStep(2);
+    if (step === 2 && isStep2Valid) return setStep(3);
+    if (step === 3 && isStep3Valid) {
+      submitProblem({
+        title,
+        description,
+        context,
+        impact,
+        tags: selectedTags,
+      });
+    }
+  };
+
+  const handleTagChange = (tag: string) => {
+    if (selectedTags.includes(tag)) {
+      setSelectedTags(selectedTags.filter(t => t !== tag));
+    } else {
+      if (selectedTags.length < 5) {
+        setSelectedTags([...selectedTags, tag]);
+      } else {
+        alert("You can select up to 5 tags only.");
+      }
+    }
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <Navbar />
-      <main className="container mx-auto max-w-4xl py-12 px-4 sm:px-6 lg:px-8 flex-grow flex flex-col">
-        <h1 className="text-3xl font-bold mb-4 sm:mb-8 text-center sm:text-left">Submit a Problem</h1>
+    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
+      <h2 className="text-xl font-bold mb-4">Submit Your Problem</h2>
 
-        <div className="flex justify-between items-center mb-8 gap-2 flex-wrap">
-          {[1, 2, 3].map((s) => (
-            <StepIndicator
-              key={s}
-              step={s}
-              currentStep={step}
-              label={["Problem Details", "Context & Impact", "Review & Submit"][s - 1]}
-            />
-          ))}
-        </div>
+      {step === 1 && (
+        <>
+          <label className="block mb-2 font-semibold">Title</label>
+          <input
+            type="text"
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            className="w-full p-2 border rounded mb-4"
+            placeholder="Enter problem title"
+          />
 
-        <Card className="w-full">
-          <CardContent className="p-6">
-            {step === 1 && (
-              <>
-                <h2 className="text-xl font-semibold mb-6">Tell us about the problem</h2>
+          <label className="block mb-2 font-semibold">Description</label>
+          <textarea
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            className="w-full p-2 border rounded"
+            placeholder="Describe the problem"
+          />
+        </>
+      )}
 
-                <div className="space-y-6">
-                  <div>
-                    <Label htmlFor="title">Problem Title</Label>
-                    <Input
-                      id="title"
-                      placeholder="e.g., Finding affordable short-term housing for internships"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      className="max-w-full"
-                    />
-                  </div>
+      {step === 2 && (
+        <>
+          <label className="block mb-2 font-semibold">Context</label>
+          <textarea
+            value={context}
+            onChange={e => setContext(e.target.value)}
+            className="w-full p-2 border rounded mb-4"
+            placeholder="Explain the context"
+          />
 
-                  <div>
-                    <Label htmlFor="description">Describe the problem in detail</Label>
-                    <Textarea
-                      id="description"
-                      placeholder="Be specific about what makes this difficult"
-                      rows={6}
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      className="max-w-full"
-                    />
-                    <p className="text-sm text-gray-500">{description.length} / 50 characters minimum</p>
-                  </div>
+          <label className="block mb-2 font-semibold">Impact</label>
+          <textarea
+            value={impact}
+            onChange={e => setImpact(e.target.value)}
+            className="w-full p-2 border rounded"
+            placeholder="What's the impact?"
+          />
+        </>
+      )}
 
-                  <div>
-                    <Label>Tags (up to 5)</Label>
-                    <Input
-                      placeholder="Search tags..."
-                      value={searchTag}
-                      onChange={(e) => setSearchTag(e.target.value)}
-                      className="max-w-full"
-                    />
-
-                    {selectedTags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 my-3 max-w-full">
-                        {selectedTags.map((tag) => (
-                          <Badge
-                            key={tag}
-                            className="bg-blue-50 text-blue-700 hover:bg-red-50 hover:text-red-700 px-3 py-1.5 cursor-pointer"
-                            onClick={() => handleTagRemove(tag)}
-                          >
-                            {tag} ×
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-
-                    <div className="flex flex-wrap gap-2 mt-3 max-h-60 overflow-auto border rounded p-2 bg-gray-50 max-w-full">
-                      {filteredTags.map((tag) => (
-                        <Badge
-                          key={tag}
-                          className="bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-700 cursor-pointer px-3 py-1.5 whitespace-nowrap"
-                          onClick={() => handleTagSelect(tag)}
-                        >
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-
-            {step === 2 && (
-              <>
-                <h2 className="text-xl font-semibold mb-6">Context & Impact</h2>
-                <div className="space-y-6">
-                  <div>
-                    <Label htmlFor="context">Who is affected by this problem?</Label>
-                    <Textarea
-                      id="context"
-                      placeholder="Describe who experiences this problem and how it affects them"
-                      rows={4}
-                      value={context}
-                      onChange={(e) => setContext(e.target.value)}
-                      className="max-w-full"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="impact">What would the impact be if solved?</Label>
-                    <Textarea
-                      id="impact"
-                      placeholder="Explain the potential benefits"
-                      rows={4}
-                      value={impact}
-                      onChange={(e) => setImpact(e.target.value)}
-                      className="max-w-full"
-                    />
-                  </div>
-                </div>
-              </>
-            )}
-
-            {step === 3 && (
-              <>
-                <h2 className="text-xl font-semibold mb-6">Review & Submit</h2>
-                <div className="space-y-6 border rounded-md p-4">
-                  <Section title="Title" content={title} />
-                  <Section title="Description" content={description} />
-                  <div>
-                    <h3 className="font-medium mb-2">Tags</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedTags.map((tag) => (
-                        <Badge key={tag} className="bg-blue-50 text-blue-700 whitespace-nowrap">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                  <Section title="Context" content={context} />
-                  <Section title="Impact" content={impact} />
-                </div>
-              </>
-            )}
-
-            <div className="mt-8">
-              <Button
-                onClick={handleContinue}
-                className={`w-full text-base sm:text-lg ${
-                  step === 3 ? "bg-green-600 hover:bg-green-700" : "bg-blue-600 hover:bg-blue-700"
+      {step === 3 && (
+        <>
+          <label className="block mb-2 font-semibold">Select Tags</label>
+          <div className="flex flex-wrap gap-2">
+            {["Education", "Health", "Technology", "Environment", "Social"].map(tag => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => handleTagChange(tag)}
+                className={`px-3 py-1 rounded-full text-sm ${
+                  selectedTags.includes(tag)
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200 text-gray-800"
                 }`}
-                disabled={(step === 1 && !isStep1Valid) || (step === 2 && !isStep2Valid)}
               >
-                {step === 3 ? "Submit" : "Continue"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </main>
+                {tag}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
+      <div className="mt-6 flex justify-between">
+        {step > 1 && (
+          <button
+            onClick={() => setStep(step - 1)}
+            className="bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded"
+          >
+            Back
+          </button>
+        )}
+
+        <button
+          onClick={handleContinue}
+          disabled={
+            (step === 1 && !isStep1Valid) ||
+            (step === 2 && !isStep2Valid) ||
+            (step === 3 && !isStep3Valid) ||
+            isLoading
+          }
+          className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded disabled:opacity-50"
+        >
+          {step === 3 ? (isLoading ? "Submitting..." : "Submit") : "Continue"}
+        </button>
+      </div>
     </div>
   );
 };
-
-// Small helper for Review & Submit section items
-const Section = ({ title, content }: { title: string; content: string }) => (
-  <div>
-    <h3 className="font-medium mb-1">{title}</h3>
-    <p>{content || "-"}</p>
-  </div>
-);
 
 export default Submit;
