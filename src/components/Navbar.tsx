@@ -10,7 +10,6 @@ const Navbar = () => {
   return (
     <header className="w-full bg-white border-b border-gray-100 shadow-sm">
       <div className="container mx-auto flex items-center justify-between px-6 relative h-20">
-     
         
         <nav className="hidden md:flex space-x-8 absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <Link to="/" className={isActive("/")}>
@@ -18,9 +17,6 @@ const Navbar = () => {
           </Link>
           <Link to="/problems" className={isActive("/problems")}>
             Problems
-          </Link>
-          <Link to="/leaderboard" className={isActive("/leaderboard")}>
-            Leaderboard
           </Link>
           <Link to="/blog" className={isActive("/blog")}>
             Blog
