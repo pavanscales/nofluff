@@ -57,52 +57,40 @@ const posts: Post[] = [
   },
 ];
 
-const PostCard = React.memo(function PostCard({
-  title,
-  excerpt,
-  author,
-  date,
-  category,
-}: Omit<Post, "id">) {
+const PostCard = React.memo(function PostCard({ title, excerpt, author, date, category }: Omit<Post, "id">) {
   return (
     <Card className="h-full flex flex-col">
       <CardHeader className="pb-2">
-        <Badge
-          variant="outline"
-          className="mb-2 w-fit bg-blue-50 text-blue-700 hover:bg-blue-50"
-        >
+        <Badge variant="outline" className="mb-2 w-fit bg-blue-50 text-blue-700 hover:bg-blue-50">
           {category}
         </Badge>
         <CardTitle className="text-lg font-semibold">{title}</CardTitle>
       </CardHeader>
-      <CardContent className="flex-grow flex flex-col">
+      <CardContent className="flex flex-col flex-grow">
         <p className="text-gray-600 mb-4">{excerpt}</p>
-        <div className="mt-auto text-sm text-gray-500">
-          <p>
-            {author} • {date}
-          </p>
-        </div>
+        <p className="mt-auto text-sm text-gray-500">
+          {author} • {date}
+        </p>
       </CardContent>
-      <div className="p-4 pt-0">
-        <Button variant="ghost" className="text-blue-600 p-0">
-          Read More <ChevronRight size={16} className="ml-1" />
-        </Button>
-      </div>
+      <Button variant="ghost" className="text-blue-600 p-4 pt-0 text-left flex items-center gap-1">
+        Read More <ChevronRight size={16} />
+      </Button>
     </Card>
   );
 });
 
 const Blog = () => {
+  const renderPostCard = React.useCallback(
+    (post: Post) => <PostCard key={post.id} {...post} />,
+    []
+  );
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
       <main className="container mx-auto py-12 px-4">
         <h1 className="text-3xl font-bold mb-8">Blog</h1>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {posts.map(({ id, ...post }) => (
-            <PostCard key={id} {...post} />
-          ))}
+          {posts.map(renderPostCard)}
         </div>
       </main>
     </div>
