@@ -57,6 +57,17 @@ export default function SubmitProblem() {
     }
   };
 
+  const canContinue =
+    problemTitle.trim().length > 0 &&
+    problemDescription.trim().length >= 50 &&
+    selectedTags.length > 0;
+
+  const handleContinue = () => {
+    if (!canContinue) return;
+    // Here you can handle navigation or form submission
+    alert("Continue to next step!");
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
@@ -151,6 +162,17 @@ export default function SubmitProblem() {
                 </div>
               </div>
             )}
+          </div>
+          <div className="flex justify-end">
+            <Button
+              onClick={handleContinue}
+              disabled={!canContinue}
+              className={`px-6 py-2 text-white rounded ${
+                canContinue ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 cursor-not-allowed"
+              }`}
+            >
+              Continue
+            </Button>
           </div>
         </div>
       </main>
