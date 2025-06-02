@@ -1,152 +1,159 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import Navbar from "@/components/Navbar";
 
-const Submit = () => {
-  const [step, setStep] = useState(1);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [context, setContext] = useState("");
-  const [impact, setImpact] = useState("");
+const tags = [
+  "Technology",
+  "Software Development",
+  "Digital Privacy",
+  "Cybersecurity",
+  "AI & Automation",
+  "Mobile Apps",
+  "Digital Accessibility",
+  "Web Development",
+  "Cloud Computing",
+  "Environment",
+  "Climate Action",
+  "Renewable Energy",
+  "Waste Management",
+  "Sustainable Living",
+  "Conservation",
+  "Urban Planning",
+  "Healthcare",
+  "Mental Health",
+  "Fitness & Exercise",
+  "Nutrition",
+  "Elder Care",
+  "Telehealth",
+  "Health Tech",
+  "Education",
+  "Online Learning",
+  "Professional Development",
+  "STEM Education",
+  "Coding Bootcamps",
+  "Technical Documentation",
+];
+
+export default function SubmitProblem() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [problemTitle, setProblemTitle] = useState("");
+  const [problemDescription, setProblemDescription] = useState("");
 
-  const isStep1Valid = title.length >= 5 && description.length >= 10;
-  const isStep2Valid = context.length >= 10 && impact.length >= 10;
-  const isStep3Valid = selectedTags.length > 0;
+  const filteredTags = tags.filter((tag) =>
+    tag.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  const { mutate: submitProblem, isLoading, isSuccess } = api.submit.submitProblem.useMutation({
-    onSuccess: () => {
-      alert("Problem submitted successfully!");
-      setStep(1);
-      setTitle("");
-      setDescription("");
-      setContext("");
-      setImpact("");
-      setSelectedTags([]);
-    },
-    onError: (err) => {
-      alert("Error: " + err.message);
-    },
-  });
-
-  const handleContinue = () => {
-    if (step === 1 && isStep1Valid) return setStep(2);
-    if (step === 2 && isStep2Valid) return setStep(3);
-    if (step === 3 && isStep3Valid) {
-      submitProblem({
-        title,
-        description,
-        context,
-        impact,
-        tags: selectedTags,
-      });
-    }
-  };
-
-  const handleTagChange = (tag: string) => {
+  const toggleTag = (tag: string) => {
     if (selectedTags.includes(tag)) {
-      setSelectedTags(selectedTags.filter(t => t !== tag));
-    } else {
-      if (selectedTags.length < 5) {
-        setSelectedTags([...selectedTags, tag]);
-      } else {
-        alert("You can select up to 5 tags only.");
-      }
+      setSelectedTags(selectedTags.filter((t) => t !== tag));
+    } else if (selectedTags.length < 5) {
+      setSelectedTags([...selectedTags, tag]);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-xl font-bold mb-4">Submit Your Problem</h2>
+    <div className="min-h-screen bg-white">
+      <Navbar />
+      <main className="container mx-auto max-w-4xl px-4 sm:px-6 md:px-8 py-8">
+        <div className="text-center mb-12">
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">Submit a Problem</h1>
 
-      {step === 1 && (
-        <>
-          <label className="block mb-2 font-semibold">Title</label>
-          <input
-            type="text"
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            className="w-full p-2 border rounded mb-4"
-            placeholder="Enter problem title"
-          />
-
-          <label className="block mb-2 font-semibold">Description</label>
-          <textarea
-            value={description}
-            onChange={e => setDescription(e.target.value)}
-            className="w-full p-2 border rounded"
-            placeholder="Describe the problem"
-          />
-        </>
-      )}
-
-      {step === 2 && (
-        <>
-          <label className="block mb-2 font-semibold">Context</label>
-          <textarea
-            value={context}
-            onChange={e => setContext(e.target.value)}
-            className="w-full p-2 border rounded mb-4"
-            placeholder="Explain the context"
-          />
-
-          <label className="block mb-2 font-semibold">Impact</label>
-          <textarea
-            value={impact}
-            onChange={e => setImpact(e.target.value)}
-            className="w-full p-2 border rounded"
-            placeholder="What's the impact?"
-          />
-        </>
-      )}
-
-      {step === 3 && (
-        <>
-          <label className="block mb-2 font-semibold">Select Tags</label>
-          <div className="flex flex-wrap gap-2">
-            {["Education", "Health", "Technology", "Environment", "Social"].map(tag => (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => handleTagChange(tag)}
-                className={`px-3 py-1 rounded-full text-sm ${
-                  selectedTags.includes(tag)
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-800"
-                }`}
-              >
-                {tag}
-              </button>
-            ))}
+          <div className="flex items-center justify-center space-x-8 mb-8">
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">1</div>
+              <span className="ml-2 text-sm text-gray-600">Problem Details</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm font-medium">2</div>
+              <span className="ml-2 text-sm text-gray-400">Context & Impact</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm font-medium">3</div>
+              <span className="ml-2 text-sm text-gray-400">Review & Submit</span>
+            </div>
           </div>
-        </>
-      )}
+        </div>
 
-      <div className="mt-6 flex justify-between">
-        {step > 1 && (
-          <button
-            onClick={() => setStep(step - 1)}
-            className="bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded"
-          >
-            Back
-          </button>
-        )}
+        <div className="bg-white rounded-lg shadow-sm border p-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Tell us about the problem</h2>
 
-        <button
-          onClick={handleContinue}
-          disabled={
-            (step === 1 && !isStep1Valid) ||
-            (step === 2 && !isStep2Valid) ||
-            (step === 3 && !isStep3Valid) ||
-            isLoading
-          }
-          className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded disabled:opacity-50"
-        >
-          {step === 3 ? (isLoading ? "Submitting..." : "Submit") : "Continue"}
-        </button>
-      </div>
+          <div className="mb-6">
+            <Input
+              type="text"
+              placeholder="Problem Title (e.g., 'Finding affordable short-term housing for internships')"
+              value={problemTitle}
+              onChange={(e) => setProblemTitle(e.target.value)}
+              className="w-full text-gray-600 placeholder:text-gray-400"
+            />
+          </div>
+
+          <div className="mb-4">
+            <Textarea
+              placeholder="Describe the problem in detail. What specifically makes this difficult?"
+              value={problemDescription}
+              onChange={(e) => setProblemDescription(e.target.value)}
+              className="w-full min-h-[120px] text-gray-600 placeholder:text-gray-400 resize-none"
+            />
+          </div>
+
+          <p className="text-sm text-gray-500 mb-8">
+            Min 50 characters. Be specific about what makes this challenging.
+          </p>
+
+          <div className="mb-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Tags (select up to 5)</h3>
+            <p className="text-sm text-gray-600 mb-4">Select categories that best describe this problem</p>
+
+            <div className="mb-4">
+              <Input
+                type="text"
+                placeholder="Search tags..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full max-w-md text-gray-600 placeholder:text-gray-400"
+              />
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {filteredTags.map((tag) => (
+                <Button
+                  key={tag}
+                  variant={selectedTags.includes(tag) ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => toggleTag(tag)}
+                  disabled={!selectedTags.includes(tag) && selectedTags.length >= 5}
+                  className={`text-sm ${
+                    selectedTags.includes(tag)
+                      ? "bg-blue-600 text-white hover:bg-blue-700"
+                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                  } ${!selectedTags.includes(tag) && selectedTags.length >= 5 ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  {tag}
+                </Button>
+              ))}
+            </div>
+
+            {selectedTags.length > 0 && (
+              <div className="mt-4">
+                <p className="text-sm text-gray-600 mb-2">Selected tags ({selectedTags.length}/5):</p>
+                <div className="flex flex-wrap gap-2">
+                  {selectedTags.map((tag) => (
+                    <Badge key={tag} variant="secondary" className="bg-blue-100 text-blue-800">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
     </div>
   );
-};
-
-export default Submit;
+}

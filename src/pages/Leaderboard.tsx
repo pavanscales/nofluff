@@ -1,73 +1,159 @@
-import Navbar from "@/components/Navbar";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+"use client";
 
-const Leaderboard = () => {
-  const contributors = [
-    { rank: 1, name: "Alex Johnson", problems: 24, solutions: 37, points: 521 },
-    { rank: 2, name: "Samantha Chen", problems: 18, solutions: 42, points: 489 },
-    { rank: 3, name: "Marcus Wilson", problems: 15, solutions: 33, points: 412 },
-    { rank: 4, name: "Priya Sharma", problems: 12, solutions: 29, points: 387 },
-    { rank: 5, name: "David Lee", problems: 19, solutions: 21, points: 352 },
-    { rank: 6, name: "Sophia Rodriguez", problems: 16, solutions: 19, points: 328 },
-    { rank: 7, name: "Mohammed Ali", problems: 11, solutions: 24, points: 315 },
-    { rank: 8, name: "Emma Thompson", problems: 14, solutions: 17, points: 301 },
-    { rank: 9, name: "Daniel Kim", problems: 10, solutions: 22, points: 286 },
-    { rank: 10, name: "Olivia Garcia", problems: 13, solutions: 15, points: 264 },
-  ];
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import Navbar from "@/components/Navbar";
+
+const tags = [
+  "Technology",
+  "Software Development",
+  "Digital Privacy",
+  "Cybersecurity",
+  "AI & Automation",
+  "Mobile Apps",
+  "Digital Accessibility",
+  "Web Development",
+  "Cloud Computing",
+  "Environment",
+  "Climate Action",
+  "Renewable Energy",
+  "Waste Management",
+  "Sustainable Living",
+  "Conservation",
+  "Urban Planning",
+  "Healthcare",
+  "Mental Health",
+  "Fitness & Exercise",
+  "Nutrition",
+  "Elder Care",
+  "Telehealth",
+  "Health Tech",
+  "Education",
+  "Online Learning",
+  "Professional Development",
+  "STEM Education",
+  "Coding Bootcamps",
+  "Technical Documentation",
+];
+
+export default function SubmitProblem() {
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [problemTitle, setProblemTitle] = useState("");
+  const [problemDescription, setProblemDescription] = useState("");
+
+  const filteredTags = tags.filter((tag) =>
+    tag.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const toggleTag = (tag: string) => {
+    if (selectedTags.includes(tag)) {
+      setSelectedTags(selectedTags.filter((t) => t !== tag));
+    } else if (selectedTags.length < 5) {
+      setSelectedTags([...selectedTags, tag]);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
       <main className="container mx-auto max-w-4xl px-4 sm:px-6 md:px-8 py-8">
-        <h1 className="text-xl sm:text-2xl font-semibold mb-6">Leaderboard</h1>
+        <div className="text-center mb-12">
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">Submit a Problem</h1>
 
-        <Card className="shadow-sm border border-gray-200 overflow-x-auto">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Top Contributors</CardTitle>
-          </CardHeader>
-          <CardContent className="p-2">
-            <Table className="text-sm min-w-[600px]">
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-12 text-center">#</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead className="text-center">Problems</TableHead>
-                  <TableHead className="text-center">Solutions</TableHead>
-                  <TableHead className="text-center">Points</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {contributors.map(({ rank, name, problems, solutions, points }) => (
-                  <TableRow key={rank}>
-                    <TableCell className="text-center font-medium">{rank}</TableCell>
-                    <TableCell>{name}</TableCell>
-                    <TableCell className="text-center">{problems}</TableCell>
-                    <TableCell className="text-center">{solutions}</TableCell>
-                    <TableCell className="text-center font-semibold text-blue-600">
-                      {points}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+          <div className="flex items-center justify-center space-x-8 mb-8">
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">1</div>
+              <span className="ml-2 text-sm text-gray-600">Problem Details</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm font-medium">2</div>
+              <span className="ml-2 text-sm text-gray-400">Context & Impact</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm font-medium">3</div>
+              <span className="ml-2 text-sm text-gray-400">Review & Submit</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm border p-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Tell us about the problem</h2>
+
+          <div className="mb-6">
+            <Input
+              type="text"
+              placeholder="Problem Title (e.g., 'Finding affordable short-term housing for internships')"
+              value={problemTitle}
+              onChange={(e) => setProblemTitle(e.target.value)}
+              className="w-full text-gray-600 placeholder:text-gray-400"
+            />
+          </div>
+
+          <div className="mb-4">
+            <Textarea
+              placeholder="Describe the problem in detail. What specifically makes this difficult?"
+              value={problemDescription}
+              onChange={(e) => setProblemDescription(e.target.value)}
+              className="w-full min-h-[120px] text-gray-600 placeholder:text-gray-400 resize-none"
+            />
+          </div>
+
+          <p className="text-sm text-gray-500 mb-8">
+            Min 50 characters. Be specific about what makes this challenging.
+          </p>
+
+          <div className="mb-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Tags (select up to 5)</h3>
+            <p className="text-sm text-gray-600 mb-4">Select categories that best describe this problem</p>
+
+            <div className="mb-4">
+              <Input
+                type="text"
+                placeholder="Search tags..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full max-w-md text-gray-600 placeholder:text-gray-400"
+              />
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {filteredTags.map((tag) => (
+                <Button
+                  key={tag}
+                  variant={selectedTags.includes(tag) ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => toggleTag(tag)}
+                  disabled={!selectedTags.includes(tag) && selectedTags.length >= 5}
+                  className={`text-sm ${
+                    selectedTags.includes(tag)
+                      ? "bg-blue-600 text-white hover:bg-blue-700"
+                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                  } ${!selectedTags.includes(tag) && selectedTags.length >= 5 ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  {tag}
+                </Button>
+              ))}
+            </div>
+
+            {selectedTags.length > 0 && (
+              <div className="mt-4">
+                <p className="text-sm text-gray-600 mb-2">Selected tags ({selectedTags.length}/5):</p>
+                <div className="flex flex-wrap gap-2">
+                  {selectedTags.map((tag) => (
+                    <Badge key={tag} variant="secondary" className="bg-blue-100 text-blue-800">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </main>
     </div>
   );
-};
-
-export default Leaderboard;
+}
