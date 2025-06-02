@@ -6,22 +6,6 @@ import { Button } from "@/components/ui/button";
 import { ChevronUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
-const CommentIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-  </svg>
-);
-
 const Problems = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("Most Votes");
@@ -35,7 +19,6 @@ const Problems = () => {
           "Finding people who have similar interests is becoming increasingly hard due to people not interacting as much as they used to.",
         categories: ["Online Communities", "Community Building", "Mental Health"],
         votes: 9,
-        comments: 3,
       },
       {
         id: 2,
@@ -44,7 +27,6 @@ const Problems = () => {
           "Managing multiple digital identities across platforms is complex. Password managers don’t fully solve it.",
         categories: ["Digital Privacy", "Cybersecurity", "Digital Accessibility"],
         votes: 5,
-        comments: 1,
       },
       {
         id: 3,
@@ -53,7 +35,6 @@ const Problems = () => {
           "Managing multiple subscriptions across different platforms is increasingly difficult.",
         categories: ["Digital Literacy", "Software Development"],
         votes: 173,
-        comments: 12,
       },
       {
         id: 4,
@@ -62,7 +43,6 @@ const Problems = () => {
           "Tools for effective collaboration across time zones in distributed teams are limited.",
         categories: ["Software Development", "Professional Development"],
         votes: 156,
-        comments: 8,
       },
     ],
     []
@@ -90,13 +70,12 @@ const Problems = () => {
     (category: string) => {
       setSearchQuery(category);
     },
-    [setSearchQuery]
+    []
   );
 
   const filteredProblems = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
     if (!query) return problems;
-
     return problems.filter(
       (problem) =>
         problem.title.toLowerCase().includes(query) ||
@@ -109,9 +88,6 @@ const Problems = () => {
     switch (sortBy) {
       case "Most Votes":
         return [...filteredProblems].sort((a, b) => b.votes - a.votes);
-      case "Most Comments":
-        return [...filteredProblems].sort((a, b) => b.comments - a.comments);
-      case "Recent":
       default:
         return filteredProblems;
     }
@@ -141,7 +117,6 @@ const Problems = () => {
           >
             <option>Most Votes</option>
             <option>Recent</option>
-            <option>Most Comments</option>
           </select>
         </div>
 
@@ -166,15 +141,9 @@ const Problems = () => {
                 <CardContent className="px-4 py-4">
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 gap-2 sm:gap-0">
                     <h2 className="text-lg font-semibold">{problem.title}</h2>
-                    <div className="flex items-center gap-4 text-xs text-gray-500">
-                      <div className="flex items-center gap-1">
-                        <ChevronUp size={16} />
-                        <span>{problem.votes}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <CommentIcon />
-                        <span>{problem.comments}</span>
-                      </div>
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <ChevronUp size={16} />
+                      <span>{problem.votes}</span>
                     </div>
                   </div>
 
