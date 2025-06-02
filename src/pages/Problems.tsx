@@ -85,12 +85,10 @@ const Problems = () => {
   }, [problems, searchQuery]);
 
   const sortedProblems = useMemo(() => {
-    switch (sortBy) {
-      case "Most Votes":
-        return [...filteredProblems].sort((a, b) => b.votes - a.votes);
-      default:
-        return filteredProblems;
+    if (sortBy === "Most Votes") {
+      return [...filteredProblems].sort((a, b) => b.votes - a.votes);
     }
+    return filteredProblems;
   }, [filteredProblems, sortBy]);
 
   return (
