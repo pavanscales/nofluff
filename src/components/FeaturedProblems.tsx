@@ -80,7 +80,6 @@ const FeaturedProblems = () => {
       comments: 9,
     },
   ];
-
   return (
     <section className="py-16 md:py-24 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -90,13 +89,11 @@ const FeaturedProblems = () => {
         <p className="text-lg text-gray-600 text-center mb-12 max-w-3xl mx-auto">
           Discover the most popular problems that need solutions
         </p>
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {problems.map((problem) => (
             <ProblemCard key={problem.id} {...problem} />
           ))}
         </div>
-
         <div className="text-center mt-12">
           <Button asChild className="bg-blue-600 hover:bg-blue-700">
             <Link to="/problems">Browse All Problems</Link>
@@ -106,5 +103,4 @@ const FeaturedProblems = () => {
     </section>
   );
 };
-
 export default FeaturedProblems;
